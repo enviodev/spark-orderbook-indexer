@@ -38,7 +38,7 @@ OrderBookContract.OrderChangeEvent.handler(({ event, context }) => {
       trader: eventOrder.trader.value,
       base_token: eventOrder.base_token.value,
       base_size: decodeI64(eventOrder.base_size),
-      order_type: eventOrder.base_size.value.toString() == "0"
+      order_type: eventOrder.base_size.value === 0n
         ? undefined
         : eventOrder.base_size.negative ? "sell" : "buy",
       base_price: eventOrder.base_price,
