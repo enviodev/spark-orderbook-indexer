@@ -27,7 +27,11 @@ OrderBookContract.MarketCreateEvent.handler(({ event, context }) => {
   });
 });
 
-OrderBookContract.OrderChangeEvent.loader(({ event, context }) => {});
+OrderBookContract.OrderChangeEvent.loader(({ event, context }) => {
+  if (event.data.order) {
+    context.SpotOrder.load(event.data.order.id);
+  }
+});
 
 OrderBookContract.OrderChangeEvent.handler(({ event, context }) => {
   const eventOrder = event.data.order;
@@ -55,8 +59,17 @@ OrderBookContract.OrderChangeEvent.handler(({ event, context }) => {
     new_base_size: order ? order.base_size : "0",
     timestamp,
   });
+
   if (order) {
-    context.SpotOrder.set(order);
+    const maybeExistingOrder = context.SpotOrder.get(order.id);
+    if (maybeExistingOrder) {
+      context.SpotOrder.set({
+        ...maybeExistingOrder,
+        base_size: order.base_size,
+      });
+    } else {
+      context.SpotOrder.set(order);
+    }
   }
 });
 
